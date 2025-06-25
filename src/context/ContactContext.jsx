@@ -21,6 +21,26 @@ export const ContactProvider = ({ children }) => {
     fetchContacts();
   }, []);
 
+  const createUser = async () => {
+  try {
+    const res = await fetch(`${API}/agendas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agenda_slug: AGENDA_SLUG })
+    });
+
+    if (res.ok) {
+      console.log(`✅ Agenda '${AGENDA_SLUG}' creada exitosamente.`);
+      fetchContacts(); // Opcional
+    } else {
+      const errorData = await res.json();
+      console.warn('ℹ️ La agenda puede que ya exista:', errorData);
+    }
+  } catch (err) {
+    console.error('❌ Error al crear usuario:', err);
+  }
+};
+
   const addContact = async (contact) => {
     try {
       const res = await fetch(`${API}/agendas/${AGENDA_SLUG}/contacts`, {
