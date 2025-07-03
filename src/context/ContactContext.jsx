@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from 'react';
 
 export const ContactContext = createContext();
 const API = 'https://playground.4geeks.com/contact';
-const AGENDA_SLUG = 'Milangela';
+const AGENDA_SLUG = 'milangelawpz';
 
 export const ContactProvider = ({ children }) => {
   const [contacts, setContacts] = useState([]);
@@ -17,29 +17,32 @@ export const ContactProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    fetchContacts();
-  }, []);
+  const createAgenda = async () => {
+    try {
+      const res = await fetch('https://playground.4geeks.com/contact/agendas/milangelawpz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agenda_slug: AGENDA_SLUG })
+      });
 
-  const createUser = async () => {
-  try {
-    const res = await fetch(`${API}/agendas`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ agenda_slug: AGENDA_SLUG })
-    });
-
-    if (res.ok) {
-      console.log(`✅ Agenda '${AGENDA_SLUG}' creada exitosamente.`);
-      fetchContacts(); // Opcional
-    } else {
-      const errorData = await res.json();
-      console.warn('ℹ️ La agenda puede que ya exista:', errorData);
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.warn('ℹ️ La agenda puede que ya exista:', errorData);
+      } else {
+        console.log(`✅ Agenda '${AGENDA_SLUG}' creada exitosamente.`);
+      }
+    } catch (err) {
+      console.error('❌ Error al crear agenda:', err);
     }
-  } catch (err) {
-    console.error('❌ Error al crear usuario:', err);
-  }
-};
+  };
+
+  useEffect(() => {
+    const initialize = async () => {
+      await createAgenda();
+      await fetchContacts();
+    };
+    initialize();
+  }, []);
 
   const addContact = async (contact) => {
     try {
